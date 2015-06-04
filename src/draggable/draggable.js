@@ -45,15 +45,6 @@ angular.module('adaptv.adaptStrap.draggable', [])
           element.on(startEvents, onPress);
           element.addClass('ad-draggable');
         }
-
-        if (!hasTouch) {
-          element.on('mousedown', '.ad-drag-handle', function() {
-            return false;
-          });
-          element.on('mousedown', function() {
-            return false;
-          }); // prevent native drag
-        }
       }
 
       //--- Event Handlers ---
@@ -103,6 +94,7 @@ angular.module('adaptv.adaptStrap.draggable', [])
           $document.on(endEvents, cancelPress);
         } else {
           onLongPress(evt);
+          return false;
         }
       }
 
@@ -197,13 +189,18 @@ angular.module('adaptv.adaptStrap.draggable', [])
         tx = (cx - mx) + offset.left - $window.scrollLeft();
         ty = (cy - my) + offset.top - $window.scrollTop();
 
+        cx = cx - $window.scrollLeft();
+        cy = cy - $window.scrollTop();
+
         moveElement(tx, ty);
 
         $rootScope.$broadcast('draggable:move', {
           x: mx,
           y: my,
           tx: tx,
-          ty:ty,
+          ty: ty,
+          cx: cx,
+          cy: cy,
           el: element,
           data: scope.data
         });
@@ -350,7 +347,7 @@ angular.module('adaptv.adaptStrap.draggable', [])
           return;
         }
 
-        var el = getCurrentDropElement(obj.tx, obj.ty, obj.el);
+        var el = getCurrentDropElement(obj.cx, obj.cy);
 
         if (el !== null) {
           elem = el;
