@@ -1318,7 +1318,7 @@ angular.module('adaptv.adaptStrap.treebrowser', []).directive('adTreeBrowser', [
         });
       }
       $http({
-        cache: true,
+        cache: $templateCache,
         url: scope.$eval(attrs.templateUrl),
         method: 'GET'
       }).then(compileTemplate);
