@@ -300,7 +300,7 @@ angular.module('adaptv.adaptStrap.utils', [])
         itemsObject = options.localData,
         localItems = itemsObject;
 
-      if (options.sortKey) {
+      if (options.sortKey && !options.draggable) {
         localItems = $filter('orderBy')(
           itemsObject,
           options.sortKey,
