@@ -37,7 +37,8 @@ angular.module('adaptv.adaptStrapDocs').constant('adaptStrapModules', [
       'tablelite.view.html',
       'tablelite.ctrl.js',
       'buyCell.html',
-      'carMoreInfo.html'
+      'carMoreInfo.html',
+      'priceHeader.html'
     ],
     directives: [{
       name: 'ad-table-lite',
@@ -217,6 +218,20 @@ angular.module('adaptv.adaptStrapDocs').constant('adaptStrapModules', [
             'Good for limited real estate scenarios.'
         },
         {
+          name: 'first-row-template',
+          required: false,
+          default: 'NA',
+          type: 'String',
+          description: 'template url with set of td tags that gets rendered in first row.'
+        },
+        {
+          name: 'last-row-template',
+          required: false,
+          default: 'NA',
+          type: 'String',
+          description: 'template url with set of td tags that gets rendered in last row.'
+        },
+        {
           name: 'row-expand-template',
           required: false,
           default: 'NA',
@@ -251,7 +266,8 @@ angular.module('adaptv.adaptStrapDocs').constant('adaptStrapModules', [
       'tableajax.view.html',
       'tableajax.ctrl.js',
       'artistPicture.html',
-      'artistMoreInfo.html'
+      'artistMoreInfo.html',
+      'pictureHeader.html'
     ],
     directives: [{
       name: 'ad-table-ajax',
@@ -389,6 +405,20 @@ angular.module('adaptv.adaptStrapDocs').constant('adaptStrapModules', [
           type: 'Boolean',
           description: 'If true, the sort icons will be right next to header text. ' +
             'Good for limited real estate scenarios.'
+        },
+        {
+          name: 'first-row-template',
+          required: false,
+          default: 'NA',
+          type: 'String',
+          description: 'template url with set of td tags that gets rendered in first row.'
+        },
+        {
+          name: 'last-row-template',
+          required: false,
+          default: 'NA',
+          type: 'String',
+          description: 'template url with set of td tags that gets rendered in last row.'
         },
         {
           name: 'row-expand-template',
