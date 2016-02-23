@@ -50,6 +50,7 @@ angular.module('adaptv.adaptStrap.infinitedropdown', ['adaptv.adaptStrap.utils',
           }
 
           if (scope.localConfig.singleSelectionMode) {
+            scope.dropdownStatus.open = false;
             element.find('.dropdown').removeClass('open');
           }
         };
