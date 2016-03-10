@@ -67,7 +67,7 @@ angular.module('adaptv.adaptStrap.tablelite', ['adaptv.adaptStrap.utils'])
           }
         }
 
-        if ($scope.items.paging.pageSizes.indexOf($scope.items.paging.pageSize) < 0) {
+        if (!$scope.items.paging.pageSize && $scope.items.paging.pageSizes[0]) {
           $scope.items.paging.pageSize = $scope.items.paging.pageSizes[0];
         }
 
