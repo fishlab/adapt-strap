@@ -51,7 +51,7 @@ angular.module('adaptv.adaptStrap.tableajax', ['adaptv.adaptStrap.utils', 'adapt
         var lastRequestToken,
           watchers = [];
 
-        if ($scope.items.paging.pageSizes.indexOf($scope.items.paging.pageSize) < 0) {
+        if (!$scope.items.paging.pageSize && $scope.items.paging.pageSizes[0]) {
           $scope.items.paging.pageSize = $scope.items.paging.pageSizes[0];
         }
 
