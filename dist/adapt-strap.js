@@ -1,6 +1,6 @@
 /**
  * adapt-strap
- * @version v2.6.0 - 2016-05-23
+ * @version v2.6.1 - 2016-08-09
  * @link https://github.com/Adaptv/adapt-strap
  * @author Kashyap Patel (kashyap@adap.tv)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -940,6 +940,7 @@ function controllerFunction($scope, $attrs) {
       $scope.getRowClass = function (item, index) {
         var rowClass = '';
         rowClass += $attrs.selectedItems && adStrapUtils.itemExistsInList(item, $scope.selectedItems) ? 'ad-selected' : '';
+        rowClass += adStrapUtils.itemExistsInList(index, $scope.localConfig.expandedItems) ? ' row-expanded' : '';
         if ($attrs.rowClassProvider) {
           rowClass += ' ' + $scope.$eval($attrs.rowClassProvider)(item, index);
         }
@@ -1234,6 +1235,7 @@ function controllerFunction($scope, $attrs) {
       $scope.getRowClass = function (item, index) {
         var rowClass = '';
         rowClass += $attrs.selectedItems && adStrapUtils.itemExistsInList(item, $scope.selectedItems) ? 'ad-selected' : '';
+        rowClass += adStrapUtils.itemExistsInList(index, $scope.localConfig.expandedItems) ? ' row-expanded' : '';
         if ($attrs.rowClassProvider) {
           rowClass += ' ' + $scope.$eval($attrs.rowClassProvider)(item, index);
         }
