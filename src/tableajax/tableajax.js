@@ -51,7 +51,7 @@ angular.module('adaptv.adaptStrap.tableajax', ['adaptv.adaptStrap.utils', 'adapt
         var lastRequestToken,
           watchers = [];
 
-        if ($scope.items.paging.pageSizes.indexOf($scope.items.paging.pageSize) < 0) {
+        if (!$scope.items.paging.pageSize && $scope.items.paging.pageSizes[0]) {
           $scope.items.paging.pageSize = $scope.items.paging.pageSizes[0];
         }
 
@@ -169,10 +169,15 @@ angular.module('adaptv.adaptStrap.tableajax', ['adaptv.adaptStrap.utils', 'adapt
           $scope.localConfig.expandedItems.length = 0;
         };
 
+        $scope.expandCollapseRow = function (index) {
+          adStrapUtils.addRemoveItemFromList(index, $scope.localConfig.expandedItems);
+        };
+
         $scope.getRowClass = function (item, index) {
           var rowClass = '';
           rowClass += ($attrs.selectedItems &&
             adStrapUtils.itemExistsInList(item, $scope.selectedItems)) ? 'ad-selected' : '';
+          rowClass += (adStrapUtils.itemExistsInList(index, $scope.localConfig.expandedItems) ? ' row-expanded' : '');
           if ($attrs.rowClassProvider) {
             rowClass += ' ' + $scope.$eval($attrs.rowClassProvider)(item, index);
           }
@@ -200,6 +205,17 @@ angular.module('adaptv.adaptStrap.tableajax', ['adaptv.adaptStrap.utils', 'adapt
         $scope.sortByColumn(column, true);
 
         $scope.loadPage(1);
+
+        // ---------- external events ------- //
+        $scope.$on('adTableAjaxAction', function (event, data) {
+          // Exposed methods for external actions
+          var actions = {
+            expandCollapseRow: $scope.expandCollapseRow
+          };
+          if (data.tableName === $scope.attrs.tableName) {
+            data.action(actions);
+          }
+        });
 
         // reset on parameter change
         watchers.push(

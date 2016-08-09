@@ -1,6 +1,6 @@
 /**
  * adapt-strap
- * @version v2.4.12 - 2016-01-31
+ * @version v2.6.1 - 2016-08-09
  * @link https://github.com/Adaptv/adapt-strap
  * @author Kashyap Patel (kashyap@adap.tv)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -592,6 +592,7 @@ function linkFunction(scope, element, attrs) {
           callback(item);
         }
         if (scope.localConfig.singleSelectionMode) {
+          scope.dropdownStatus.open = false;
           element.find('.dropdown').removeClass('open');
         }
       };
@@ -832,7 +833,7 @@ function controllerFunction($scope, $attrs) {
       $scope.visibleColumnDefinition = $filter('filter')($scope.columnDefinition, $scope.columnVisible);
       // ---------- Local data ---------- //
       var lastRequestToken, watchers = [];
-      if ($scope.items.paging.pageSizes.indexOf($scope.items.paging.pageSize) < 0) {
+      if (!$scope.items.paging.pageSize && $scope.items.paging.pageSizes[0]) {
         $scope.items.paging.pageSize = $scope.items.paging.pageSizes[0];
       }
       // ---------- ui handlers ---------- //
@@ -933,9 +934,13 @@ function controllerFunction($scope, $attrs) {
       $scope.collapseAll = function () {
         $scope.localConfig.expandedItems.length = 0;
       };
+      $scope.expandCollapseRow = function (index) {
+        adStrapUtils.addRemoveItemFromList(index, $scope.localConfig.expandedItems);
+      };
       $scope.getRowClass = function (item, index) {
         var rowClass = '';
         rowClass += $attrs.selectedItems && adStrapUtils.itemExistsInList(item, $scope.selectedItems) ? 'ad-selected' : '';
+        rowClass += adStrapUtils.itemExistsInList(index, $scope.localConfig.expandedItems) ? ' row-expanded' : '';
         if ($attrs.rowClassProvider) {
           rowClass += ' ' + $scope.$eval($attrs.rowClassProvider)(item, index);
         }
@@ -959,6 +964,14 @@ function controllerFunction($scope, $attrs) {
         };
       $scope.sortByColumn(column, true);
       $scope.loadPage(1);
+      // ---------- external events ------- //
+      $scope.$on('adTableAjaxAction', function (event, data) {
+        // Exposed methods for external actions
+        var actions = { expandCollapseRow: $scope.expandCollapseRow };
+        if (data.tableName === $scope.attrs.tableName) {
+          data.action(actions);
+        }
+      });
       // reset on parameter change
       watchers.push($scope.$watch($attrs.ajaxConfig, function () {
         $scope.loadPage(1);
@@ -1045,7 +1058,7 @@ function controllerFunction($scope, $attrs) {
           }
         }
       }
-      if ($scope.items.paging.pageSizes.indexOf($scope.items.paging.pageSize) < 0) {
+      if (!$scope.items.paging.pageSize && $scope.items.paging.pageSizes[0]) {
         $scope.items.paging.pageSize = $scope.items.paging.pageSizes[0];
       }
       // ---------- ui handlers ---------- //
@@ -1133,6 +1146,9 @@ function controllerFunction($scope, $attrs) {
       $scope.collapseAll = function () {
         $scope.localConfig.expandedItems.length = 0;
       };
+      $scope.expandCollapseRow = function (index) {
+        adStrapUtils.addRemoveItemFromList(index, $scope.localConfig.expandedItems);
+      };
       $scope.onDragStart = function (data, dragElement) {
         $scope.localConfig.expandedItems.length = 0;
         dragElement = dragElement.el;
@@ -1219,6 +1235,7 @@ function controllerFunction($scope, $attrs) {
       $scope.getRowClass = function (item, index) {
         var rowClass = '';
         rowClass += $attrs.selectedItems && adStrapUtils.itemExistsInList(item, $scope.selectedItems) ? 'ad-selected' : '';
+        rowClass += adStrapUtils.itemExistsInList(index, $scope.localConfig.expandedItems) ? ' row-expanded' : '';
         if ($attrs.rowClassProvider) {
           rowClass += ' ' + $scope.$eval($attrs.rowClassProvider)(item, index);
         }
@@ -1248,6 +1265,14 @@ function controllerFunction($scope, $attrs) {
         };
       $scope.sortByColumn(column, true);
       $scope.loadPage(1);
+      // ---------- external events ------- //
+      $scope.$on('adTableLiteAction', function (event, data) {
+        // Exposed methods for external actions
+        var actions = { expandCollapseRow: $scope.expandCollapseRow };
+        if (data.tableName === $scope.attrs.tableName) {
+          data.action(actions);
+        }
+      });
       // ---------- set watchers ---------- //
       watchers.push($scope.$watch($attrs.localDataSource, function () {
         $scope.loadPage($scope.items.paging.currentPage);
@@ -1648,27 +1673,29 @@ var deb = function (func, delay, immediate, ctx) {
           pagingArray: [],
           token: options.token
         };
-      var start = (options.pageNumber - 1) * options.pageSize, end = start + options.pageSize, i, itemsObject = options.localData, localItems = itemsObject;
-      if (options.sortKey && !options.draggable) {
-        localItems = $filter('orderBy')(itemsObject, options.sortKey, options.sortDirection);
-      }
-      response.items = localItems.slice(start, end);
-      response.allItems = itemsObject;
-      response.currentPage = options.pageNumber;
-      response.totalPages = Math.ceil(itemsObject.length / options.pageSize);
-      var TOTAL_PAGINATION_ITEMS = 5;
-      var minimumBound = options.pageNumber - Math.floor(TOTAL_PAGINATION_ITEMS / 2);
-      for (i = minimumBound; i <= options.pageNumber; i++) {
-        if (i > 0) {
+      if (angular.isDefined(options.localData)) {
+        var start = (options.pageNumber - 1) * options.pageSize, end = start + options.pageSize, i, itemsObject = options.localData, localItems = itemsObject;
+        if (options.sortKey && !options.draggable) {
+          localItems = $filter('orderBy')(itemsObject, options.sortKey, options.sortDirection);
+        }
+        response.items = localItems.slice(start, end);
+        response.allItems = itemsObject;
+        response.currentPage = options.pageNumber;
+        response.totalPages = Math.ceil(itemsObject.length / options.pageSize);
+        var TOTAL_PAGINATION_ITEMS = 5;
+        var minimumBound = options.pageNumber - Math.floor(TOTAL_PAGINATION_ITEMS / 2);
+        for (i = minimumBound; i <= options.pageNumber; i++) {
+          if (i > 0) {
+            response.pagingArray.push(i);
+          }
+        }
+        while (response.pagingArray.length < TOTAL_PAGINATION_ITEMS) {
+          if (i > response.totalPages) {
+            break;
+          }
           response.pagingArray.push(i);
+          i++;
         }
-      }
-      while (response.pagingArray.length < TOTAL_PAGINATION_ITEMS) {
-        if (i > response.totalPages) {
-          break;
-        }
-        response.pagingArray.push(i);
-        i++;
       }
       return response;
     };

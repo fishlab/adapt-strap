@@ -67,7 +67,7 @@ angular.module('adaptv.adaptStrap.tablelite', ['adaptv.adaptStrap.utils'])
           }
         }
 
-        if ($scope.items.paging.pageSizes.indexOf($scope.items.paging.pageSize) < 0) {
+        if (!$scope.items.paging.pageSize && $scope.items.paging.pageSizes[0]) {
           $scope.items.paging.pageSize = $scope.items.paging.pageSizes[0];
         }
 
@@ -176,6 +176,10 @@ angular.module('adaptv.adaptStrap.tablelite', ['adaptv.adaptStrap.utils'])
           $scope.localConfig.expandedItems.length = 0;
         };
 
+        $scope.expandCollapseRow = function (index) {
+          adStrapUtils.addRemoveItemFromList(index, $scope.localConfig.expandedItems);
+        };
+
         $scope.onDragStart = function(data, dragElement) {
           $scope.localConfig.expandedItems.length = 0;
           dragElement = dragElement.el;
@@ -276,6 +280,7 @@ angular.module('adaptv.adaptStrap.tablelite', ['adaptv.adaptStrap.utils'])
           var rowClass = '';
           rowClass += ($attrs.selectedItems &&
             adStrapUtils.itemExistsInList(item, $scope.selectedItems)) ? 'ad-selected' : '';
+          rowClass += (adStrapUtils.itemExistsInList(index, $scope.localConfig.expandedItems) ? ' row-expanded' : '');
           if ($attrs.rowClassProvider) {
             rowClass += ' ' + $scope.$eval($attrs.rowClassProvider)(item, index);
           }
@@ -310,6 +315,17 @@ angular.module('adaptv.adaptStrap.tablelite', ['adaptv.adaptStrap.utils'])
         $scope.sortByColumn(column, true);
 
         $scope.loadPage(1);
+
+        // ---------- external events ------- //
+        $scope.$on('adTableLiteAction', function (event, data) {
+          // Exposed methods for external actions
+          var actions = {
+            expandCollapseRow: $scope.expandCollapseRow
+          };
+          if (data.tableName === $scope.attrs.tableName) {
+            data.action(actions);
+          }
+        });
 
         // ---------- set watchers ---------- //
         watchers.push(
